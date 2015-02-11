@@ -16,5 +16,6 @@ Pod::Spec.new do |s|
   s.source_files = "AZUPickerController/Classes/**/*.{h,m}"
   s.requires_arc = true
   s.framework    = "UIKit"
+  s.platform     = :ios, '7.0'
 end
 
