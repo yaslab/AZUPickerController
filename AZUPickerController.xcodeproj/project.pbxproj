@@ -14,6 +14,7 @@
 		0EA7627F1A8BC1EB00ED554B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0EA7627E1A8BC1EB00ED554B /* Images.xcassets */; };
 		0EA762821A8BC1EB00ED554B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0EA762801A8BC1EB00ED554B /* LaunchScreen.xib */; };
 		0EA7628E1A8BC1EB00ED554B /* AZUPickerControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA7628D1A8BC1EB00ED554B /* AZUPickerControllerTests.m */; };
+		0EA7629A1A8BC2F200ED554B /* AZUPickerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA762991A8BC2F200ED554B /* AZUPickerController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,8 @@
 		0EA762871A8BC1EB00ED554B /* AZUPickerControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AZUPickerControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EA7628C1A8BC1EB00ED554B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0EA7628D1A8BC1EB00ED554B /* AZUPickerControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZUPickerControllerTests.m; sourceTree = "<group>"; };
+		0EA762981A8BC2F200ED554B /* AZUPickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AZUPickerController.h; sourceTree = "<group>"; };
+		0EA762991A8BC2F200ED554B /* AZUPickerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AZUPickerController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +84,7 @@
 		0EA762701A8BC1EB00ED554B /* AZUPickerController */ = {
 			isa = PBXGroup;
 			children = (
+				0EA762971A8BC2C900ED554B /* Classes */,
 				0EA762751A8BC1EB00ED554B /* AppDelegate.h */,
 				0EA762761A8BC1EB00ED554B /* AppDelegate.m */,
 				0EA762781A8BC1EB00ED554B /* ViewController.h */,
@@ -117,6 +121,15 @@
 				0EA7628C1A8BC1EB00ED554B /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		0EA762971A8BC2C900ED554B /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				0EA762981A8BC2F200ED554B /* AZUPickerController.h */,
+				0EA762991A8BC2F200ED554B /* AZUPickerController.m */,
+			);
+			path = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -221,6 +234,7 @@
 			files = (
 				0EA7627A1A8BC1EB00ED554B /* ViewController.m in Sources */,
 				0EA762771A8BC1EB00ED554B /* AppDelegate.m in Sources */,
+				0EA7629A1A8BC2F200ED554B /* AZUPickerController.m in Sources */,
 				0EA762741A8BC1EB00ED554B /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
