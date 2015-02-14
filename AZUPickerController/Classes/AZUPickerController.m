@@ -8,6 +8,7 @@
 
 #import "AZUPickerController.h"
 
+#define kOSVersion ((CGFloat)[[[UIDevice currentDevice] systemVersion] floatValue])
 #define kAZUPickerButtonHeight 44.f
 
 // -----------------------------------------------------------------------------
@@ -17,13 +18,13 @@
 
 @property (nonatomic, readwrite) NSString *title;
 @property (nonatomic, readwrite) AZUPickerActionStyle style;
-@property (nonatomic, copy) void (^handler)(AZUPickerAction *, NSArray *);
+@property (nonatomic, copy) void (^handler)(AZUPickerAction *);
 
 @end
 
 @implementation AZUPickerAction
 
-+ (instancetype)actionWithTitle:(NSString *)title style:(AZUPickerActionStyle)style handler:(void (^)(AZUPickerAction *action, NSArray *selectedRows))handler {
++ (instancetype)actionWithTitle:(NSString *)title style:(AZUPickerActionStyle)style handler:(void (^)(AZUPickerAction *action))handler {
     AZUPickerAction *action = [self new];
     action.title = title;
     action.style = style;
@@ -35,32 +36,34 @@
 @end
 
 // -----------------------------------------------------------------------------
-#pragma mark - private AZUPickerView
+#pragma mark - private AZUPickerPanelView
 
-@interface AZUPickerView : UIView
+@interface AZUPickerPanelView : UIView
 
 @property (nonatomic, readonly) UILabel *titleLabel;
 @property (nonatomic, readonly) UILabel *messageLabel;
-@property (nonatomic, readonly) UIPickerView *pickerView;
+//@property (nonatomic, readonly) UIView *pickerView;
+
+- (instancetype)initWithPickerView:(UIView *)pickerView;
 
 @end
 
-@implementation AZUPickerView
+@implementation AZUPickerPanelView
 
 {
     UILabel *_titleLabel;
     UILabel *_messageLabel;
-    UIPickerView *_pickerView;
+    UIView *_pickerView;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
+- (instancetype)initWithPickerView:(UIView *)pickerView {
+    self = [super initWithFrame:CGRectZero];
     if (self) {
         self.clipsToBounds = YES;
         self.backgroundColor = [UIColor whiteColor];
         self.layer.cornerRadius = 3.f;
 
-        _pickerView = [[UIPickerView alloc] initWithFrame:CGRectZero];
+        _pickerView = pickerView;
         [self addSubview:_pickerView];
 
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -153,7 +156,7 @@
 
 @protocol AZUButtonViewDelegate <NSObject>
 
-- (void)buttonView:(AZUButtonView *)buttonView didClickWithAction:(AZUPickerAction *)action;
+- (void)buttonViewDidClick:(AZUButtonView *)buttonView;
 
 @end
 
@@ -165,6 +168,7 @@
 @property (nonatomic) UIColor *buttonTitleColor;
 
 - (void)addButtonWithAction:(AZUPickerAction *)action;
+@property (nonatomic, readonly) NSArray *actions;
 
 @end
 
@@ -230,7 +234,6 @@
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextSaveGState(ctx);
 
-    CGContextBeginPath(ctx);
     CGContextSetAllowsAntialiasing(ctx, false);
     CGContextSetShouldAntialias(ctx, false);
     CGContextSetLineWidth(ctx, 0.5f);
@@ -245,10 +248,15 @@
         CGContextAddLineToPoint(ctx, width, y);
     }
 
-    CGContextClosePath(ctx);
     CGContextStrokePath(ctx);
 
     CGContextRestoreGState(ctx);
+}
+
+#pragma mark Property Accesser
+
+- (NSArray *)actions {
+    return _actions;
 }
 
 #pragma mark AZUButtonView
@@ -263,10 +271,12 @@
 }
 
 - (void)onButtonClicked:(UIButton *)sender {
+    NSInteger index = [_buttons indexOfObject:sender];
+    AZUPickerAction *action = _actions[index];
+    action.handler(action);
+
     if (self.delegate) {
-        NSInteger index = [_buttons indexOfObject:sender];
-        AZUPickerAction *action = _actions[index];
-        [self.delegate buttonView:self didClickWithAction:action];
+        [self.delegate buttonViewDidClick:self];
     }
 }
 
@@ -277,7 +287,10 @@
 
 @interface AZUPickerViewModel : NSObject <UIPickerViewDataSource, UIPickerViewDelegate>
 
-- (void)addComponent:(NSArray *)rows;
+@property (nonatomic, weak) UIPickerView *pickerView;
+@property (nonatomic, readonly) NSArray *components;
+
+- (void)addComponent:(NSArray *)rows selectedRow:(NSInteger)rowIndex;
 
 @end
 
@@ -287,11 +300,40 @@
     NSMutableArray *_components;
 }
 
-- (void)addComponent:(NSArray *)rows {
+- (void)addComponent:(NSArray *)rows selectedRow:(NSInteger)rowIndex {
     [_components addObject:rows];
+    [_pickerView reloadAllComponents];
+
+    if (rows.count != 0) {
+        // TODO: Exceptionのほうがいい?
+        if (rowIndex < 0) {
+            NSLog(@"%s: TRIM VALUE %ld to %ld", __PRETTY_FUNCTION__, (long)rowIndex, 0L);
+            rowIndex = 0;
+        }
+        else if (rowIndex >= rows.count) {
+            NSLog(@"%s: TRIM VALUE %ld to %ld", __PRETTY_FUNCTION__, (long)rowIndex, (long)(rows.count - 1));
+            rowIndex = rows.count - 1;
+        }
+        NSInteger component = _components.count - 1;
+        [_pickerView selectRow:rowIndex inComponent:component animated:YES];
+    }
 }
 
-#pragma mark - NSObject
+#pragma mark Property Accesser
+
+- (void)setPickerView:(UIPickerView *)pickerView {
+    _pickerView = pickerView;
+    if (_pickerView) {
+        _pickerView.dataSource = self;
+        _pickerView.delegate = self;
+    }
+}
+
+- (NSArray *)components {
+    return _components;
+}
+
+#pragma mark NSObject
 
 - (instancetype)init {
     self = [super init];
@@ -301,7 +343,7 @@
     return self;
 }
 
-#pragma mark - UIPickerViewDataSource
+#pragma mark UIPickerViewDataSource
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
     return _components.count;
@@ -312,7 +354,7 @@
     return rows.count;
 }
 
-#pragma mark - UIPickerViewDelegate
+#pragma mark UIPickerViewDelegate
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
     NSArray *rows = _components[component];
@@ -335,45 +377,90 @@
 @implementation AZUPickerController
 
 {
-    AZUPickerView *_pickerView;
+    UIPickerView *_pickerView;
+    AZUPickerViewModel *_pickerViewModel;
+
+    UIDatePicker *_datePicker;
+
+    AZUPickerPanelView *_pickerPanelView;
     AZUButtonView *_destructiveButtonView;
     AZUButtonView *_normalButtonView;
     AZUButtonView *_cancelButtonView;
 
-    AZUPickerViewModel *_pickerViewModel;
+    AZUPickerControllerStyle _preferredStyle;
 }
 
-@dynamic title, message;
+@dynamic actions, components, title, message;
 
-+ (instancetype)pickerControllerWithTitle:(NSString *)title message:(NSString *)message {
++ (instancetype)pickerControllerWithTitle:(NSString *)title message:(NSString *)message preferredStyle:(AZUPickerControllerStyle)preferredStyle {
     AZUPickerController *picker = [[self alloc] initWithNibName:nil bundle:nil];
-    picker.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    if (kOSVersion >= 8.0) {
+        picker.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    }
     picker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    picker->_preferredStyle = preferredStyle;
+    [picker commomInit];
     picker.title = title;
     picker.message = message;
     return picker;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        [self commomInit];
-    }
-    return self;
+// FIXME: DEBUG
+- (void)dealloc {
+    NSLog(@"DEALLOC %s", __PRETTY_FUNCTION__);
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        [self commomInit];
-    }
-    return self;
+- (void)dismiss {
+    [self dismissViewControllerAnimated:YES completion:^{
+        // Clean up objects that holding blocks.
+        // This is to avoid the circular reference problem.
+        [_pickerPanelView removeFromSuperview];
+        [_destructiveButtonView removeFromSuperview];
+        [_normalButtonView removeFromSuperview];
+        [_cancelButtonView removeFromSuperview];
+        _pickerPanelView = nil;
+        _destructiveButtonView = nil;
+        _normalButtonView = nil;
+        _cancelButtonView = nil;
+    }];
 }
+
+//- (id)initWithCoder:(NSCoder *)aDecoder {
+//    self = [super initWithCoder:aDecoder];
+//    if (self) {
+//        [self commomInit];
+//    }
+//    return self;
+//}
+
+//- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+//    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+//    if (self) {
+//        [self commomInit];
+//    }
+//    return self;
+//}
 
 - (void)commomInit {
-    _pickerView = [[AZUPickerView alloc] initWithFrame:CGRectZero];
-    _pickerView.backgroundColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
-    [self.view addSubview:_pickerView];
+    self.view.backgroundColor = [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.4f];
+
+    //_pickerPanelView = [[AZUPickerView alloc] initWithFrame:CGRectZero];
+    UIView *pickerView = nil;
+    switch (_preferredStyle) {
+        case AZUPickerControllerStylePickerView:
+            _pickerView = [[UIPickerView alloc] initWithFrame:CGRectZero];
+            _pickerViewModel = [AZUPickerViewModel new];
+            _pickerViewModel.pickerView = _pickerView;
+            pickerView = _pickerView;
+            break;
+        case AZUPickerControllerStyleDatePicker:
+            _datePicker = [[UIDatePicker alloc] initWithFrame:CGRectZero];
+            pickerView = _datePicker;
+            break;
+    }
+    _pickerPanelView = [[AZUPickerPanelView alloc] initWithPickerView:pickerView];
+    _pickerPanelView.backgroundColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
+    [self.view addSubview:_pickerPanelView];
 
     _destructiveButtonView = [[AZUButtonView alloc] initWithFrame:CGRectZero];
     _destructiveButtonView.backgroundColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
@@ -390,21 +477,38 @@
     _cancelButtonView.useBoldFont = YES;
     _cancelButtonView.delegate = self;
     [self.view addSubview:_cancelButtonView];
-
-    _pickerViewModel = [AZUPickerViewModel new];
-    _pickerView.pickerView.dataSource = _pickerViewModel;
-    _pickerView.pickerView.delegate = _pickerViewModel;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.view.backgroundColor = [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.4f];
-
     UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTapGesture:)];
     [self.view addGestureRecognizer:gesture];
+}
 
-    [_pickerView.pickerView reloadAllComponents];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    if (kOSVersion < 8.0) {
+        // Take a screenshot.
+        CALayer *layer = [[[UIApplication sharedApplication] keyWindow] layer];
+        CGFloat scale = [[UIScreen mainScreen] scale];
+        UIGraphicsBeginImageContextWithOptions(layer.frame.size, NO, scale);
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        [layer renderInContext:ctx];
+        UIImage *screenshot = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:screenshot];
+        CGRect frame = CGRectMake(0.f, 0.f, screenshot.size.width, screenshot.size.height);
+        imageView.frame = frame;
+        [self.view insertSubview:imageView atIndex:0];
+
+        UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
+        view.frame = frame;
+        view.backgroundColor = [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.4f];
+        [self.view insertSubview:view aboveSubview:imageView];
+    }
 }
 
 - (void)viewDidLayoutSubviews {
@@ -443,19 +547,19 @@
     }
     _destructiveButtonView.frame = frame;
 
-    fitSize = [_pickerView sizeThatFits:maxSize];
-    frame = _pickerView.frame;
+    fitSize = [_pickerPanelView sizeThatFits:maxSize];
+    frame = _pickerPanelView.frame;
     frame.size = fitSize;
     frame.origin.x = margin;
     frame.origin.y = CGRectGetMinY(_destructiveButtonView.frame) - fitSize.height;
     if ((int)CGRectGetHeight(_destructiveButtonView.frame) != 0) {
         frame.origin.y -= margin;
     }
-    _pickerView.frame = frame;
+    _pickerPanelView.frame = frame;
 }
 
-- (void)addComponent:(NSArray *)rows {
-    [_pickerViewModel addComponent:rows];
+- (void)addComponent:(NSArray *)rows selectedRow:(NSInteger)rowIndex {
+    [_pickerViewModel addComponent:rows selectedRow:rowIndex];
 }
 
 - (void)addAction:(AZUPickerAction *)action {
@@ -476,43 +580,52 @@
     if (sender.state == UIGestureRecognizerStateEnded) {
         if (sender.numberOfTouches == 1) {
             CGPoint location = [sender locationInView:self.view];
-            if (location.y < CGRectGetMinY(_pickerView.frame)) {
+            if (location.y < CGRectGetMinY(_pickerPanelView.frame)) {
                 // TODO: 閉じる前に専用のキャンセルを発火する?
-                [self dismissViewControllerAnimated:YES completion:^{}];
+                [self dismiss];
             }
         }
     }
 }
 
-#pragma mark - Dynamic Proprery
+#pragma mark Proprery Accesser
+
+- (NSArray *)actions {
+    NSMutableArray *actions = [NSMutableArray new];
+    [actions addObjectsFromArray:_normalButtonView.actions];
+    [actions addObjectsFromArray:_cancelButtonView.actions];
+    [actions addObjectsFromArray:_destructiveButtonView.actions];
+    return actions;
+}
+
+- (NSArray *)components {
+    return _pickerViewModel.components;
+}
 
 - (NSString *)title {
-    return [_pickerView.titleLabel.text copy];
+    return [_pickerPanelView.titleLabel.text copy];
 }
 
 - (void)setTitle:(NSString *)title {
-    _pickerView.titleLabel.text = [title copy];
+    _pickerPanelView.titleLabel.text = [title copy];
 }
 
 - (NSString *)message {
-    return [_pickerView.messageLabel.text copy];
+    return [_pickerPanelView.messageLabel.text copy];
 }
 
 - (void)setMessage:(NSString *)message {
-    _pickerView.messageLabel.text = [message copy];
+    _pickerPanelView.messageLabel.text = [message copy];
 }
 
-#pragma mark - AZUButtonViewDelegate
+//- (UIPickerView *)pickerView {
+//    return _pickerView;
+//}
 
-- (void)buttonView:(AZUButtonView *)buttonView didClickWithAction:(AZUPickerAction *)action {
-    NSInteger count = [_pickerView.pickerView numberOfComponents];
-    NSMutableArray *rows = [[NSMutableArray alloc] initWithCapacity:count];
-    for (NSInteger i = 0; i < count; i++) {
-        NSInteger selectedRow = [_pickerView.pickerView selectedRowInComponent:i];
-        [rows addObject:@(selectedRow)];
-    }
-    action.handler(action, [rows copy]);
-    [self dismissViewControllerAnimated:YES completion:^{}];
+#pragma mark AZUButtonViewDelegate
+
+- (void)buttonViewDidClick:(AZUButtonView *)buttonView {
+    [self dismiss];
 }
 
 @end

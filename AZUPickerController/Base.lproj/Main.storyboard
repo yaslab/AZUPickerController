@@ -16,8 +16,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M5B-dI-E7D">
-                                <rect key="frame" x="16" y="250" width="90" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M5B-dI-E7D">
+                                <rect key="frame" x="15" y="40" width="65" height="30"/>
                                 <state key="normal" title="Sample 1">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -25,8 +25,23 @@
                                     <action selector="onSample1ButtonClicked:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="eWe-sL-eYJ"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eI1-eZ-XU7">
+                                <rect key="frame" x="15" y="90" width="65" height="30"/>
+                                <state key="normal" title="Sample 2">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="onSample2ButtonClicked:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="9no-ot-KaW"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="M5B-dI-E7D" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="15" id="Hvi-SG-kZm"/>
+                            <constraint firstItem="eI1-eZ-XU7" firstAttribute="top" secondItem="M5B-dI-E7D" secondAttribute="bottom" constant="20" id="P8X-3g-4pd"/>
+                            <constraint firstItem="M5B-dI-E7D" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="20" id="Y80-OP-mMC"/>
+                            <constraint firstItem="eI1-eZ-XU7" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="15" id="diW-cv-w4K"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

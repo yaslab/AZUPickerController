@@ -15,10 +15,16 @@ typedef NS_ENUM(NSInteger, AZUPickerActionStyle) {
     AZUPickerActionStyleDestructive,
 };
 
+// -----------------------------------------------------------------------------
+typedef NS_ENUM(NSInteger, AZUPickerControllerStyle) {
+    AZUPickerControllerStylePickerView = 0,
+    AZUPickerControllerStyleDatePicker
+};
+
+// -----------------------------------------------------------------------------
 @interface AZUPickerAction : NSObject
 
-/// selectedRows: Array of NSNumber
-+ (instancetype)actionWithTitle:(NSString *)title style:(AZUPickerActionStyle)style handler:(void (^)(AZUPickerAction *action, NSArray *selectedRows))handler;
++ (instancetype)actionWithTitle:(NSString *)title style:(AZUPickerActionStyle)style handler:(void (^)(AZUPickerAction *action))handler;
 
 @property (nonatomic, readonly) NSString *title;
 @property (nonatomic, readonly) AZUPickerActionStyle style;
@@ -29,12 +35,22 @@ typedef NS_ENUM(NSInteger, AZUPickerActionStyle) {
 // -----------------------------------------------------------------------------
 @interface AZUPickerController : UIViewController
 
++ (instancetype)pickerControllerWithTitle:(NSString *)title message:(NSString *)message preferredStyle:(AZUPickerControllerStyle)preferredStyle;
+
+- (void)addAction:(AZUPickerAction *)action;
+@property (nonatomic, readonly) NSArray *actions;
+
+// For UIPickerView
+- (void)addComponent:(NSArray *)rows selectedRow:(NSInteger)rowIndex;
+@property (nonatomic, readonly) NSArray *components;
+@property (nonatomic, readonly) UIPickerView *pickerView;
+
+// For UIDatePicker
+@property (nonatomic, readonly) UIDatePicker *datePicker;
+
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *message;
 
-+ (instancetype)pickerControllerWithTitle:(NSString *)title message:(NSString *)message;
-
-- (void)addComponent:(NSArray *)rows;
-- (void)addAction:(AZUPickerAction *)action;
+@property (nonatomic, readonly) AZUPickerControllerStyle preferredStyle;
 
 @end
