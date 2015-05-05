@@ -395,7 +395,7 @@
 + (instancetype)pickerControllerWithTitle:(NSString *)title message:(NSString *)message preferredStyle:(AZUPickerControllerStyle)preferredStyle {
     AZUPickerController *picker = [[self alloc] initWithNibName:nil bundle:nil];
     if (kOSVersion >= 8.0) {
-        picker.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+        picker.modalPresentationStyle = UIModalPresentationOverFullScreen;
     }
     picker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     picker->_preferredStyle = preferredStyle;
