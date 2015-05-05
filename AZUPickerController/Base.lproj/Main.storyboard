@@ -34,15 +34,35 @@
                                     <action selector="onSample2ButtonClicked:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="9no-ot-KaW"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="m4u-Gp-jwx">
+                                <rect key="frame" x="100" y="40" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DvM-aR-IWn">
+                                <rect key="frame" x="100" y="90" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="eI1-eZ-XU7" firstAttribute="top" secondItem="DvM-aR-IWn" secondAttribute="top" id="9Fy-IR-Yan"/>
                             <constraint firstItem="M5B-dI-E7D" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="15" id="Hvi-SG-kZm"/>
+                            <constraint firstItem="DvM-aR-IWn" firstAttribute="leading" secondItem="eI1-eZ-XU7" secondAttribute="trailing" constant="20" id="LVB-Sf-bAe"/>
                             <constraint firstItem="eI1-eZ-XU7" firstAttribute="top" secondItem="M5B-dI-E7D" secondAttribute="bottom" constant="20" id="P8X-3g-4pd"/>
                             <constraint firstItem="M5B-dI-E7D" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="20" id="Y80-OP-mMC"/>
                             <constraint firstItem="eI1-eZ-XU7" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="15" id="diW-cv-w4K"/>
+                            <constraint firstItem="m4u-Gp-jwx" firstAttribute="top" secondItem="M5B-dI-E7D" secondAttribute="top" id="iKc-zW-38s"/>
+                            <constraint firstItem="m4u-Gp-jwx" firstAttribute="leading" secondItem="M5B-dI-E7D" secondAttribute="trailing" constant="20" id="yuW-Fo-Juh"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="label1" destination="m4u-Gp-jwx" id="LPN-WB-Cld"/>
+                        <outlet property="label2" destination="DvM-aR-IWn" id="Ynp-RD-mX7"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
