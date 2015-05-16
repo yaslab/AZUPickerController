@@ -360,6 +360,7 @@
 				INFOPLIST_FILE = AZUPickerController/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -370,6 +371,7 @@
 				INFOPLIST_FILE = AZUPickerController/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -426,6 +428,7 @@
 				0EA762931A8BC1EB00ED554B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0EA762941A8BC1EB00ED554B /* Build configuration list for PBXNativeTarget "AZUPickerControllerTests" */ = {
 			isa = XCConfigurationList;
@@ -434,6 +437,7 @@
 				0EA762961A8BC1EB00ED554B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
