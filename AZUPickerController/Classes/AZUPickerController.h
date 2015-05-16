@@ -18,7 +18,8 @@ typedef NS_ENUM(NSInteger, AZUPickerActionStyle) {
 // -----------------------------------------------------------------------------
 typedef NS_ENUM(NSInteger, AZUPickerControllerStyle) {
     AZUPickerControllerStylePickerView = 0,
-    AZUPickerControllerStyleDatePicker
+    AZUPickerControllerStyleDatePicker,
+    AZUPickerControllerStyleCustom,
 };
 
 // -----------------------------------------------------------------------------
@@ -47,6 +48,8 @@ typedef NS_ENUM(NSInteger, AZUPickerControllerStyle) {
 
 // For UIDatePicker
 @property (nonatomic, readonly) UIDatePicker *datePicker;
+
+@property (nonatomic) UIView *contentView;
 
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *message;
